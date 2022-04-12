@@ -138,6 +138,40 @@ resource "newrelic_nrql_alert_condition" "CPU_DEMO_POLICY_K8sNode" {
   }
 }
 
+resource "newrelic_nrql_alert_condition" "MISSINGPOD_TCDM_STATEFULSET" {
+  account_id                   = var.accountid
+  policy_id                    = newrelic_alert_policy.TCDM.id
+  type                         = "static"
+  name                         = "MISSINGPOD_TCDM_STATEFULSET"
+  description                  = "Alert when Container Memory is over 60%, 80% "
+  enabled                      = true
+  violation_time_limit_seconds = 259200
+  aggregation_window           = 60
+  aggregation_method           = "event_flow"
+  aggregation_delay              = 120
+  expiration_duration            = 600
+  open_violation_on_expiration   = true
+  close_violations_on_expiration = false  
+
+  nrql {
+    query             = "FROM K8sStatefulsetSample SELECT latest(podsMissing) facet displayName "
+  }
+
+  critical {
+    operator              = "above"
+    threshold             = 1
+    threshold_duration    = 300
+    threshold_occurrences = "ALL"
+  }
+  
+  warning {
+    operator              = "above"
+    threshold             = 0
+    threshold_duration    = 300
+    threshold_occurrences = "ALL"
+  }
+}
+
 # Notification channel
 resource "newrelic_alert_channel" "alert_notification_email" {
   name = "your_channel_name"
