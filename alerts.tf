@@ -138,11 +138,11 @@ resource "newrelic_nrql_alert_condition" "CPU_DEMO_POLICY_K8sNode" {
   }
 }
 
-resource "newrelic_nrql_alert_condition" "MISSINGPOD_TCDM_STATEFULSET" {
+resource "newrelic_nrql_alert_condition" "MISSINGPOD_DEMO_POLICY_STATEFULSET" {
   account_id                   = var.accountid
-  policy_id                    = newrelic_alert_policy.TCDM.id
+  policy_id                    = newrelic_alert_policy.DEMO_POLICY.id
   type                         = "static"
-  name                         = "MISSINGPOD_TCDM_STATEFULSET"
+  name                         = "MISSINGPOD_DEMO_POLICY_STATEFULSET"
   description                  = "Alert when Container Memory is over 60%, 80% "
   enabled                      = true
   violation_time_limit_seconds = 259200
