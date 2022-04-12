@@ -109,7 +109,7 @@ resource "newrelic_nrql_alert_condition" "CPU_DEMO_POLICY_K8sNode" {
   policy_id                    = newrelic_alert_policy.DEMO_POLICY.id
   type                         = "static"
   name                         = "CPU_DEMO_POLICY_K8sNode"
-  description                  = "Alert when Memory Utilization > 60, 80 "
+  description                  = "Alert when CPU Utilization > 60, 80 "
   enabled                      = true
   violation_time_limit_seconds = 259200
   aggregation_window           = 60
@@ -143,7 +143,7 @@ resource "newrelic_nrql_alert_condition" "MISSINGPOD_DEMO_POLICY_STATEFULSET" {
   policy_id                    = newrelic_alert_policy.DEMO_POLICY.id
   type                         = "static"
   name                         = "MISSINGPOD_DEMO_POLICY_STATEFULSET"
-  description                  = "Alert when Container Memory is over 60%, 80% "
+  description                  = "Alert when Pods missing in stateful set "
   enabled                      = true
   violation_time_limit_seconds = 259200
   aggregation_window           = 60
@@ -155,6 +155,40 @@ resource "newrelic_nrql_alert_condition" "MISSINGPOD_DEMO_POLICY_STATEFULSET" {
 
   nrql {
     query             = "FROM K8sStatefulsetSample SELECT latest(podsMissing) facet displayName "
+  }
+
+  critical {
+    operator              = "above"
+    threshold             = 1
+    threshold_duration    = 300
+    threshold_occurrences = "ALL"
+  }
+  
+  warning {
+    operator              = "above"
+    threshold             = 0
+    threshold_duration    = 300
+    threshold_occurrences = "ALL"
+  }
+}
+
+resource "newrelic_nrql_alert_condition" "MISSINGPOD_DEMO_POLICY_RS" {
+  account_id                   = var.accountid
+  policy_id                    = newrelic_alert_policy.DEMO_POLICY.id
+  type                         = "static"
+  name                         = "MISSINGPOD_DEMO_POLICY_RS"
+  description                  = "Alert when Pods Missing in Replica set"
+  enabled                      = true
+  violation_time_limit_seconds = 259200
+  aggregation_window           = 60
+  aggregation_method           = "event_flow"
+  aggregation_delay              = 120
+  expiration_duration            = 600
+  open_violation_on_expiration   = true
+  close_violations_on_expiration = false  
+
+  nrql {
+    query             = "FROM K8sReplicasetSample SELECT latest(podsMissing) facet displayName "
   }
 
   critical {
